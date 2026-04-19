@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Programming Demos</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      color: #2c3e50;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .card {
+      display: block;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.15s, border-color 0.15s;
+    }
+
+    .card:hover {
+      border-color: #4a90e2;
+      box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+      color: #2c3e50;
+    }
+
+    .card-desc {
+      font-size: 0.8rem;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Web Programming Demos</h1>
+
+<section>
+  <h2>Getting Started</h2>
+  <div class="grid">
+    <a class="card" href="hello.html">
+      <div class="card-title">Hello World</div>
+      <div class="card-desc">The simplest HTML page</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>HTML Elements</h2>
+  <div class="grid">
+    <a class="card" href="headings.html">
+      <div class="card-title">Headings</div>
+      <div class="card-desc">H1–H6 heading levels</div>
+    </a>
+    <a class="card" href="lists.html">
+      <div class="card-title">Lists</div>
+      <div class="card-desc">Ordered and unordered lists</div>
+    </a>
+    <a class="card" href="table.html">
+      <div class="card-title">Table</div>
+      <div class="card-desc">HTML table structure</div>
+    </a>
+    <a class="card" href="form0.html">
+      <div class="card-title">Form (basic)</div>
+      <div class="card-desc">Simple HTML form</div>
+    </a>
+    <a class="card" href="form1.html">
+      <div class="card-title">Form (advanced)</div>
+      <div class="card-desc">Form with datalist &amp; inputs</div>
+    </a>
+    <a class="card" href="image0.html">
+      <div class="card-title">Image (basic)</div>
+      <div class="card-desc">Embedding images</div>
+    </a>
+    <a class="card" href="image1.html">
+      <div class="card-title">Image (advanced)</div>
+      <div class="card-desc">Responsive images</div>
+    </a>
+    <a class="card" href="link.html">
+      <div class="card-title">Links</div>
+      <div class="card-desc">Hyperlinks and anchors</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>CSS Basics</h2>
+  <div class="grid">
+    <a class="card" href="style0.html">
+      <div class="card-title">Style (inline)</div>
+      <div class="card-desc">Inline CSS styling</div>
+    </a>
+    <a class="card" href="style1.html">
+      <div class="card-title">Style (internal)</div>
+      <div class="card-desc">Internal &lt;style&gt; block</div>
+    </a>
+    <a class="card" href="style2.html">
+      <div class="card-title">Style (external)</div>
+      <div class="card-desc">Linked external stylesheet</div>
+    </a>
+    <a class="card" href="font.html">
+      <div class="card-title">Font</div>
+      <div class="card-desc">Font family, size, weight</div>
+    </a>
+    <a class="card" href="size.html">
+      <div class="card-title">Size</div>
+      <div class="card-desc">Width, height, units</div>
+    </a>
+    <a class="card" href="border.html">
+      <div class="card-title">Border</div>
+      <div class="card-desc">Border styles and radius</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>CSS Selectors</h2>
+  <div class="grid">
+    <a class="card" href="class.html">
+      <div class="card-title">Class</div>
+      <div class="card-desc">Class selectors (.name)</div>
+    </a>
+    <a class="card" href="id.html">
+      <div class="card-title">ID</div>
+      <div class="card-desc">ID selectors (#name)</div>
+    </a>
+    <a class="card" href="attribute.html">
+      <div class="card-title">Attribute</div>
+      <div class="card-desc">Attribute selectors [attr]</div>
+    </a>
+    <a class="card" href="descendant.html">
+      <div class="card-title">Descendant</div>
+      <div class="card-desc">Descendant combinators</div>
+    </a>
+    <a class="card" href="child.html">
+      <div class="card-title">Child</div>
+      <div class="card-desc">Child combinator (&gt;)</div>
+    </a>
+    <a class="card" href="multiple.html">
+      <div class="card-title">Multiple</div>
+      <div class="card-desc">Multiple selectors</div>
+    </a>
+    <a class="card" href="div_span.html">
+      <div class="card-title">Div &amp; Span</div>
+      <div class="card-desc">Block vs inline elements</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>CSS Effects &amp; Components</h2>
+  <div class="grid">
+    <a class="card" href="hover.html">
+      <div class="card-title">Hover</div>
+      <div class="card-desc">:hover pseudo-class</div>
+    </a>
+    <a class="card" href="before.html">
+      <div class="card-title">Before</div>
+      <div class="card-desc">::before pseudo-element</div>
+    </a>
+    <a class="card" href="selection.html">
+      <div class="card-title">Selection</div>
+      <div class="card-desc">::selection styling</div>
+    </a>
+    <a class="card" href="print.html">
+      <div class="card-title">Print</div>
+      <div class="card-desc">Print media query</div>
+    </a>
+    <a class="card" href="alert.html">
+      <div class="card-title">Alert</div>
+      <div class="card-desc">Alert / notification styling</div>
+    </a>
+    <a class="card" href="buttons.html">
+      <div class="card-title">Buttons</div>
+      <div class="card-desc">Button styles</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>CSS Layout</h2>
+  <div class="grid">
+    <a class="card" href="flexbox.html">
+      <div class="card-title">Flexbox</div>
+      <div class="card-desc">Flexible box layout</div>
+    </a>
+    <a class="card" href="grid.html">
+      <div class="card-title">Grid</div>
+      <div class="card-desc">CSS Grid layout</div>
+    </a>
+    <a class="card" href="columns0.html">
+      <div class="card-title">Columns (basic)</div>
+      <div class="card-desc">CSS multi-column layout</div>
+    </a>
+    <a class="card" href="columns1.html">
+      <div class="card-title">Columns (gaps)</div>
+      <div class="card-desc">Column gaps and rules</div>
+    </a>
+    <a class="card" href="columns2.html">
+      <div class="card-title">Columns (span)</div>
+      <div class="card-desc">Column span</div>
+    </a>
+    <a class="card" href="responsive0.html">
+      <div class="card-title">Responsive (basic)</div>
+      <div class="card-desc">Media queries basics</div>
+    </a>
+    <a class="card" href="responsive1.html">
+      <div class="card-title">Responsive (advanced)</div>
+      <div class="card-desc">Responsive breakpoints</div>
+    </a>
+    <a class="card" href="bootstrap.html">
+      <div class="card-title">Bootstrap</div>
+      <div class="card-desc">Bootstrap 4 framework</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>SCSS</h2>
+  <div class="grid">
+    <a class="card" href="variables/variables.html">
+      <div class="card-title">Variables</div>
+      <div class="card-desc">SCSS variable declarations</div>
+    </a>
+    <a class="card" href="nesting/nesting.html">
+      <div class="card-title">Nesting</div>
+      <div class="card-desc">SCSS nested selectors</div>
+    </a>
+    <a class="card" href="inheritance/inheritance.html">
+      <div class="card-title">Inheritance</div>
+      <div class="card-desc">SCSS @extend placeholder</div>
+    </a>
+  </div>
+</section>
+
+</body>
+</html>
