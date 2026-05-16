@@ -19,13 +19,6 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ─── AUTH HELPERS ────────────────────────────────────────────────────────────
 
-/**
- * Sign up a new user (buyer by default)
- * @param {string} email
- * @param {string} password
- * @param {string} fullName
- * @param {string} phone
- */
 async function signUp(email, password, fullName, phone = '') {
   const { data, error } = await db.auth.signUp({
     email,
@@ -38,18 +31,12 @@ async function signUp(email, password, fullName, phone = '') {
   return data;
 }
 
-/**
- * Sign in with email + password
- */
 async function signIn(email, password) {
   const { data, error } = await db.auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
-/**
- * Sign in with Google OAuth
- */
 async function signInWithGoogle() {
   const { error } = await db.auth.signInWithOAuth({
     provider: 'google',
@@ -58,18 +45,12 @@ async function signInWithGoogle() {
   if (error) throw error;
 }
 
-/**
- * Sign out current user
- */
 async function signOut() {
   const { error } = await db.auth.signOut();
   if (error) throw error;
   window.location.href = 'login.html';
 }
 
-/**
- * Send password reset email
- */
 async function sendPasswordReset(email) {
   const { error } = await db.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin + '/login.html'
@@ -77,17 +58,11 @@ async function sendPasswordReset(email) {
   if (error) throw error;
 }
 
-/**
- * Get current logged-in user (or null)
- */
 async function getCurrentUser() {
   const { data: { user } } = await db.auth.getUser();
   return user;
 }
 
-/**
- * Get current user's profile from profiles table
- */
 async function getProfile() {
   const user = await getCurrentUser();
   if (!user) return null;
@@ -96,9 +71,6 @@ async function getProfile() {
   return data;
 }
 
-/**
- * Update current user's profile
- */
 async function updateProfile(updates) {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');
@@ -107,20 +79,12 @@ async function updateProfile(updates) {
   return data;
 }
 
-/**
- * Guard: redirect to login if not authenticated
- * Call this at the top of any protected page script
- */
 async function requireAuth(redirectTo = 'login.html') {
   const user = await getCurrentUser();
   if (!user) window.location.href = redirectTo;
   return user;
 }
 
-/**
- * Guard: redirect to home if already authenticated
- * Call this on login.html to skip the page if already signed in
- */
 async function redirectIfAuthed(redirectTo = 'index.html') {
   const user = await getCurrentUser();
   if (user) window.location.href = redirectTo;
@@ -128,10 +92,6 @@ async function redirectIfAuthed(redirectTo = 'index.html') {
 
 // ─── PRODUCTS ────────────────────────────────────────────────────────────────
 
-/**
- * Fetch active products (with optional filters)
- * @param {{ categoryId, storeId, search, limit, offset }} opts
- */
 async function getProducts(opts = {}) {
   let query = db
     .from('products')
@@ -150,9 +110,6 @@ async function getProducts(opts = {}) {
   return data;
 }
 
-/**
- * Fetch a single product by slug
- */
 async function getProduct(slug) {
   const { data, error } = await db
     .from('products')
@@ -164,9 +121,17 @@ async function getProduct(slug) {
   return data;
 }
 
-/**
- * Fetch all categories
- */
+async function getProductById(id) {
+  const { data, error } = await db
+    .from('products')
+    .select(`*, store:stores(*), category:categories(*), images:product_images(*)`)
+    .eq('id', id)
+    .eq('status', 'active')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 async function getCategories() {
   const { data, error } = await db.from('categories').select('*').order('name');
   if (error) throw error;
@@ -175,23 +140,17 @@ async function getCategories() {
 
 // ─── CART ────────────────────────────────────────────────────────────────────
 
-/**
- * Get current user's cart items
- */
 async function getCart() {
   const user = await getCurrentUser();
   if (!user) return [];
   const { data, error } = await db
     .from('cart_items')
-    .select(`*, product:products(id, name, price, slug, images:product_images(url))`)
+    .select(`*, product:products(id, name, price, slug, store_id, images:product_images(url, position))`)
     .eq('user_id', user.id);
   if (error) throw error;
   return data;
 }
 
-/**
- * Add item to cart (or update quantity if already exists)
- */
 async function addToCart(productId, quantity = 1) {
   const user = await getCurrentUser();
   if (!user) { window.location.href = 'login.html'; return; }
@@ -217,26 +176,17 @@ async function addToCart(productId, quantity = 1) {
   }
 }
 
-/**
- * Update cart item quantity
- */
 async function updateCartItem(cartItemId, quantity) {
   if (quantity <= 0) return removeFromCart(cartItemId);
   const { error } = await db.from('cart_items').update({ quantity }).eq('id', cartItemId);
   if (error) throw error;
 }
 
-/**
- * Remove item from cart
- */
 async function removeFromCart(cartItemId) {
   const { error } = await db.from('cart_items').delete().eq('id', cartItemId);
   if (error) throw error;
 }
 
-/**
- * Clear entire cart for current user
- */
 async function clearCart() {
   const user = await getCurrentUser();
   if (!user) return;
@@ -244,9 +194,6 @@ async function clearCart() {
   if (error) throw error;
 }
 
-/**
- * Get cart item count (for badge in navbar)
- */
 async function getCartCount() {
   const user = await getCurrentUser();
   if (!user) return 0;
@@ -265,7 +212,7 @@ async function getWishlist() {
   if (!user) return [];
   const { data, error } = await db
     .from('wishlists')
-    .select(`*, product:products(id, name, price, slug, images:product_images(url))`)
+    .select(`*, product:products(id, name, price, slug, images:product_images(url, position))`)
     .eq('user_id', user.id);
   if (error) throw error;
   return data;
@@ -284,18 +231,15 @@ async function toggleWishlist(productId) {
 
   if (existing) {
     await db.from('wishlists').delete().eq('id', existing.id);
-    return false; // removed
+    return false;
   } else {
     await db.from('wishlists').insert({ user_id: user.id, product_id: productId });
-    return true;  // added
+    return true;
   }
 }
 
 // ─── ORDERS ──────────────────────────────────────────────────────────────────
 
-/**
- * Get current user's orders
- */
 async function getOrders() {
   const user = await getCurrentUser();
   if (!user) return [];
@@ -308,10 +252,19 @@ async function getOrders() {
   return data;
 }
 
-/**
- * Place an order from current cart
- * @param {{ shippingAddressId, notes, couponCode }} opts
- */
+async function getOrder(orderId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await db
+    .from('orders')
+    .select(`*, items:order_items(*), shipping_address:addresses(*)`)
+    .eq('id', orderId)
+    .eq('user_id', user.id)
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 async function placeOrder(opts = {}) {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');
@@ -322,7 +275,8 @@ async function placeOrder(opts = {}) {
   const subtotal     = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shippingCost = 2.50;
   const tax          = +(subtotal * 0.1).toFixed(2);
-  const total        = +(subtotal + shippingCost + tax).toFixed(2);
+  const discount     = opts.discount || 0;
+  const total        = +(subtotal + shippingCost + tax - discount).toFixed(2);
 
   const { data: order, error: orderError } = await db
     .from('orders')
@@ -332,6 +286,7 @@ async function placeOrder(opts = {}) {
       subtotal,
       shipping_cost:       shippingCost,
       tax,
+      discount,
       total,
       notes:               opts.notes || null,
     })
@@ -363,7 +318,11 @@ async function placeOrder(opts = {}) {
 async function getAddresses() {
   const user = await getCurrentUser();
   if (!user) return [];
-  const { data, error } = await db.from('addresses').select('*').eq('user_id', user.id);
+  const { data, error } = await db
+    .from('addresses')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('is_default', { ascending: false });
   if (error) throw error;
   return data;
 }
@@ -374,6 +333,69 @@ async function addAddress(address) {
   const { data, error } = await db.from('addresses').insert({ ...address, user_id: user.id }).select().single();
   if (error) throw error;
   return data;
+}
+
+async function updateAddress(addressId, updates) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+  const { data, error } = await db
+    .from('addresses')
+    .update(updates)
+    .eq('id', addressId)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteAddress(addressId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+  const { error } = await db
+    .from('addresses')
+    .delete()
+    .eq('id', addressId)
+    .eq('user_id', user.id);
+  if (error) throw error;
+}
+
+async function setDefaultAddress(addressId) {
+  const user = await getCurrentUser();
+  if (!user) throw new Error('Not authenticated');
+  await db.from('addresses').update({ is_default: false }).eq('user_id', user.id);
+  const { data, error } = await db
+    .from('addresses')
+    .update({ is_default: true })
+    .eq('id', addressId)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// ─── COUPONS ─────────────────────────────────────────────────────────────────
+
+async function validateCoupon(code, subtotal) {
+  const { data, error } = await db
+    .from('coupons')
+    .select('*')
+    .eq('code', code.toUpperCase())
+    .eq('is_active', true)
+    .single();
+
+  if (error || !data) throw new Error('Invalid or expired coupon code');
+  if (data.expires_at && new Date(data.expires_at) < new Date()) throw new Error('Coupon has expired');
+  if (data.max_uses && data.uses_count >= data.max_uses) throw new Error('Coupon usage limit reached');
+  if (data.min_order_amount && subtotal < data.min_order_amount)
+    throw new Error(`Minimum order amount of $${data.min_order_amount.toFixed(2)} required`);
+
+  let discountAmount = 0;
+  if (data.discount_percent) discountAmount = +(subtotal * data.discount_percent / 100).toFixed(2);
+  else if (data.discount_amount) discountAmount = +data.discount_amount.toFixed(2);
+
+  return { ...data, discountAmount };
 }
 
 // ─── REVIEWS ─────────────────────────────────────────────────────────────────
@@ -392,17 +414,12 @@ async function addReview(productId, rating, title, body) {
 
 // ─── SEARCH ──────────────────────────────────────────────────────────────────
 
-async function searchProducts(query) {
-  return getProducts({ search: query, limit: 30 });
+async function searchProducts(query, opts = {}) {
+  return getProducts({ search: query, limit: opts.limit || 30, ...opts });
 }
 
 // ─── REALTIME ────────────────────────────────────────────────────────────────
 
-/**
- * Subscribe to real-time order status updates
- * @param {string} orderId
- * @param {function} callback - called with updated order row
- */
 function subscribeToOrder(orderId, callback) {
   return db
     .channel(`order-${orderId}`)
@@ -415,9 +432,6 @@ function subscribeToOrder(orderId, callback) {
     .subscribe();
 }
 
-/**
- * Subscribe to cart changes (multi-tab sync)
- */
 async function subscribeToCart(callback) {
   const user = await getCurrentUser();
   if (!user) return;
@@ -454,10 +468,6 @@ async function markNotificationRead(notificationId) {
 
 // ─── STORAGE HELPERS ─────────────────────────────────────────────────────────
 
-/**
- * Upload an avatar image for the current user
- * @param {File} file
- */
 async function uploadAvatar(file) {
   const user = await getCurrentUser();
   if (!user) throw new Error('Not authenticated');
@@ -470,11 +480,6 @@ async function uploadAvatar(file) {
   return data.publicUrl;
 }
 
-/**
- * Upload a product image (for sellers)
- * @param {File} file
- * @param {string} productId
- */
 async function uploadProductImage(file, productId) {
   const ext  = file.name.split('.').pop();
   const path = `${productId}/${Date.now()}.${ext}`;
@@ -486,10 +491,6 @@ async function uploadProductImage(file, productId) {
 
 // ─── UI UTILITIES ─────────────────────────────────────────────────────────────
 
-/**
- * Update cart badge count in navbar
- * Call on page load on every page that has a cart icon
- */
 async function updateCartBadge(selector = '.cart-badge') {
   const count = await getCartCount();
   const badge = document.querySelector(selector);
@@ -499,9 +500,6 @@ async function updateCartBadge(selector = '.cart-badge') {
   }
 }
 
-/**
- * Show a toast notification
- */
 function showToast(msg, icon = '✅', duration = 3000) {
   let toast = document.getElementById('sb-toast');
   if (!toast) {
@@ -522,10 +520,6 @@ function showToast(msg, icon = '✅', duration = 3000) {
 
 // ─── AUTH STATE LISTENER ──────────────────────────────────────────────────────
 
-/**
- * Listens for auth state changes (login/logout)
- * Updates UI elements with class .user-name, .user-avatar, .auth-show, .auth-hide
- */
 db.auth.onAuthStateChange(async (event, session) => {
   const user = session?.user;
 
@@ -544,18 +538,17 @@ db.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
-// ─── EXPORT (for use as ES module if bundled) ─────────────────────────────────
-// If you're using plain <script> tags, all functions are globally available.
-// If you migrate to a bundler later, uncomment the exports below:
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
 /*
 export {
   db, signUp, signIn, signInWithGoogle, signOut, sendPasswordReset,
   getCurrentUser, getProfile, updateProfile, requireAuth, redirectIfAuthed,
-  getProducts, getProduct, getCategories, searchProducts,
+  getProducts, getProduct, getProductById, getCategories, searchProducts,
   getCart, addToCart, updateCartItem, removeFromCart, clearCart, getCartCount,
   getWishlist, toggleWishlist,
-  getOrders, placeOrder,
-  getAddresses, addAddress,
+  getOrders, getOrder, placeOrder,
+  getAddresses, addAddress, updateAddress, deleteAddress, setDefaultAddress,
+  validateCoupon,
   addReview,
   subscribeToOrder, subscribeToCart,
   getNotifications, markNotificationRead,
